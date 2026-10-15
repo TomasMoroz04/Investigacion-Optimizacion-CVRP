@@ -1,0 +1,163 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.8cm]{geometry} % Márgenes ajustados para aprovechar el espacio
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{sectsty} % Para ajustar el tamaño de los títulos
+
+\sectionfont{\large}
+\subsectionfont{\normalsize}
+
+\pagestyle{plain}
+
+\begin{document}
+
+\title{\textbf{Análisis y Diseño de Algoritmos: Capacitated Vehicle Routing Problem (CVRP)}}
+
+\author{
+    Santiago Halberstadt, Martin Kalesplaner, Tomás Moroz, Roy Ruiz \\
+    \textit{Ingeniería en Informática, Universidad Gastón Dachary (UGD)} \\
+    \textit{Docente: Ing. Hector Ruidias}
+}
+\date{16 de junio de 2026}
+
+\maketitle
+
+\begin{abstract}
+\textbf{Abstract—} El Problema de Enrutamiento de Vehículos Capacitados (CVRP) representa uno de los desafíos más significativos en la optimización logística contemporánea. Este informe técnico analiza la transición de los métodos de resolución desde las heurísticas clásicas hacia las tecnologías emergentes. Se examina cómo las limitaciones computacionales de los algoritmos exactos ante problemas NP-Hard de gran escala han impulsado el desarrollo de la Optimización Combinatoria Neuronal (NCO), el uso de Modelos de Lenguaje (LLMs) como guías heurísticas y la aplicación de algoritmos híbridos de Computación Cuántica. A través de una revisión metodológica y un análisis comparativo, el estudio demuestra que estas nuevas tecnologías permiten reducir drásticamente los tiempos de ejecución, manteniendo brechas de suboptimalidad competitivas. Los hallazgos sugieren que la integración de inteligencia artificial y aceleradores cuánticos proporciona la flexibilidad necesaria para gestionar entornos dinámicos con variabilidad en la demanda y el tráfico, superando la rigidez de los enfoques estáticos tradicionales.
+
+\vspace{0.3cm}
+\textbf{Keywords—} CVRP, Optimización Combinatoria Neuronal, Computación Cuántica, LLMs, Metaheurísticas.
+\end{abstract}
+
+\section{Introducción}
+
+\subsection{Descripción y Clasificación del Problema}
+El CVRP es una extensión del Problema del Viajante de Comercio (TSP) que introduce restricciones de capacidad de carga. Pertenece a la clase NP-Hard y es APX-hard, lo que implica que no existen algoritmos polinomiales para soluciones óptimas en instancias grandes \cite{ref1}. Formalmente, se define sobre un grafo $G=(V,E)$ donde se busca minimizar el costo total de rutas que inician y terminan en un depósito 0, visitando a cada cliente exactamente una vez sin superar la capacidad $Q$ \cite{ref1}.
+
+El Problema de Enrutamiento de Vehículos Capacitados (CVRP, por sus siglas en inglés) es una extensión del clásico Problema del Viajante de Comercio (TSP - Traveling Salesman Problem). La diferencia fundamental radica en que el CVRP introduce una restricción práctica del mundo real: los vehículos poseen una capacidad de carga limitada y deben regresar al punto de origen (depósito) para reabastecerse o finalizar su turno antes de poder continuar con las entregas. 
+
+Formalmente, el CVRP se define sobre un grafo completo $G=(V,E)$, donde $V=\{0,1,...,n\}$ es el conjunto de nodos (siendo 0 el depósito y $\{1,...,n\}$ los clientes). Cada cliente $i$ tiene una demanda $d_i>0$, y cada arista $(i, j)$ tiene un costo $c_{ij}$ asociado (típicamente la distancia euclidiana). El objetivo es encontrar un conjunto de rutas de costo mínimo, donde cada una comience y termine en el depósito, de manera que cada cliente sea visitado exactamente una vez y la demanda total de cada ruta no supere la capacidad $Q$ del vehículo \cite{ref1}.
+
+\subsection{Escenarios de Aplicación}
+Este modelo es crítico en la distribución de mercadería urbana, la recolección de residuos \cite{ref2}, la logística de última milla \cite{ref3} y las cadenas de frío que requieren ventanas de tiempo estrictas \cite{ref4}. El CVRP modela con precisión diversos problemas logísticos reales:
+
+\begin{itemize}
+    \item \textbf{Distribución de mercadería:} Las restricciones del tránsito y el espacio impiden el uso de camiones grandes en centros urbanos, lo que obliga a las empresas a usar flotas de menor capacidad. 
+    \item \textbf{Recolección de residuos urbanos:} Los camiones recolectores tienen una capacidad de carga limitada y deben regresar al centro de disposición final para vaciarse \cite{ref2}.
+    \item \textbf{Logística de última milla:} Servicios de courier y comercio electrónico que deben optimizar flotas de vehículos pequeños para entregar múltiples paquetes \cite{ref3}.
+    \item \textbf{Cadenas de suministro y cold-chain:} Distribución de productos perecederos o refrigerados que añaden restricciones de ventanas de tiempo (CVRPTW) \cite{ref4}.
+\end{itemize}
+
+\section{Revisión de Enfoques}
+
+El CVRP pertenece a la clase de problemas NP-Hard, lo que significa que no existe un algoritmo conocido capaz de resolverlo de forma óptima en tiempo polinomial para instancias grandes. Más precisamente, el CVRP con un número de vehículos $k\ge3$ es también APX-hard \cite{ref1}. Los algoritmos exactos tradicionales solo son viables para instancias de tamaño reducido. Históricamente, el récord de la instancia más grande resuelta de forma exacta es de 135 nodos (año 2007) \cite{ref5}. 
+
+\subsection{Enfoques Clásicos}
+
+\subsubsection{Algoritmos Exactos}
+Los métodos exactos garantizan encontrar la solución óptima, pero su complejidad temporal es exponencial en el peor de los casos. Los principales son Branch-and-Bound y Programación Dinámica.
+
+\subsubsection{Heurísticas Clásicas}
+Desde el algoritmo de Clarke y Wright (1964) se han propuesto muchas heurísticas constructivas. Este método parte de una solución inicial donde cada cliente tiene su propia ruta y las fusiona iterativamente \cite{ref5}. 
+
+\subsubsection{Metaheurísticas}
+Las metaheurísticas son el estándar actual en la industria para resolver instancias de tamaño medio y grande \cite{ref5,ref6}:
+\begin{itemize}
+    \item Búsqueda Tabú (Tabu Search): Mantiene una lista de movimientos prohibidos ("tabú") para evitar ciclar.
+    \item Algoritmos Genéticos (GA): Operan sobre poblaciones de soluciones.
+    \item Optimización por Colonia de Hormigas (ACO): Simula el comportamiento colectivo de las hormigas \cite{ref6}.
+    \item Simulated Annealing: Acepta soluciones peores con una probabilidad decreciente.
+\end{itemize}
+
+\subsection{Tecnologías Emergentes: NCO y Aprendizaje Profundo}
+
+\textbf{1. Optimización Combinatoria Neuronal (NCO)}: La Optimización Combinatoria Neuronal utiliza modelos de aprendizaje profundo para construir soluciones de alta calidad directamente. El entrenamiento del modelo se realiza una sola vez de forma offline \cite{ref8}.
+
+\textbf{2. LLMs Aplicados al CVRP}: Los Grandes Modelos de Lenguaje (LLMs) se están investigando recientemente como herramientas de apoyo para la optimización combinatoria. 
+
+La resolución matemática tradicional del CVRP suele asumir un entorno estático, donde las demandas de los clientes y los tiempos de viaje se consideran constantes \cite{ref2}. Esta suposición es poco realista en la práctica \cite{ref3}. El uso de Redes Neuronales de Grafos (GNN) combinadas con PPO permite extraer características espaciales y manejar la incertidumbre mediante técnicas de Enmascaramiento de Acciones \cite{ref2}. 
+
+Para resolver problemas con flotas heterogéneas se desarrolló ECHO, un solucionador neuronal que optimiza la toma de decisiones secuenciales mediante tres componentes principales \cite{ref1}: Codificador de Nodos de Modalidad Dual, Decodificador de Atención Cruzada Libre de Parámetros (PFCA) y Aumento de Datos Basado en Simetrías \cite{ref1}.
+
+Las pruebas de ECHO muestran un rendimiento superior frente a métodos previos, manteniendo una brecha de error pequeña (de entre 1.0\% y 1.32\%) en comparación con heurísticas avanzadas como SISR, pero calculando las soluciones hasta 100 veces más rápido \cite{ref5,ref8}.
+
+\subsection{LLMs como Optimizadores Heurísticos}
+
+El enfoque LLM-Enhanced Q-Learning combina la inferencia del LLM con el ajuste del Aprendizaje por Refuerzo mediante un proceso de dos etapas \cite{ref1}:
+\begin{itemize}
+    \item Fase de Exploración Guiada por LLM: Al principio del entrenamiento, se le pasa al LLM el estado actual del problema para que proponga un conjunto de acciones iniciales \cite{ref9}. 
+    \item Fase de Optimización Autónoma: A medida que el algoritmo acumula experiencia, reduce su dependencia del LLM \cite{ref1}.
+\end{itemize}
+
+Para evitar errores, la arquitectura incluye un sistema de verificación de tres niveles: Validación Sintáctica, Verificación Semántica y Imposición de Restricciones Físicas \cite{ref1}. Los resultados indican una reducción promedio del 7.3\% en los costos operativos en comparación con un Q-learning estándar para problemas CVRPTW \cite{ref1}.
+
+\subsection{Enfoques Cuánticos Híbridos}
+
+Las Unidades de Procesamiento Cuántico (QPU) aprovechan principios físicos como la superposición y el entrelazamiento para evaluar múltiples combinaciones al mismo tiempo \cite{ref12}. En la actualidad se enfoca en algoritmos híbridos cuánticos-clásicos \cite{ref14}. 
+
+Bajo este enfoque, se desarrollaron técnicas como el solucionador basado en agrupamiento (DBSCAN Solver) y el solucionador por partición de soluciones (SPS) \cite{ref14}. Otro desarrollo importante es la Búsqueda Tabú Cuántica Híbrida (HQTS) \cite{ref12}. Las pruebas indican que el algoritmo HQTS logra brechas de suboptimalidad pequeñas (entre el 2.15\% y el 4.72\%) \cite{ref13}.
+
+\section{Análisis Comparativo}
+
+Los métodos exactos tienen una complejidad que escala de forma exponencial $O(2^{n}) \circ O(n!)$, lo que impide su uso en problemas de tamaño real con más de 150 clientes \cite{ref1}. Las heurísticas constructivas reducen la complejidad a niveles manejables de alrededor de $O(n^{2}\log n)$ \cite{ref1}, resolviendo problemas en segundos, pero suelen generar soluciones de menor calidad debido a que toman decisiones locales sin evaluar el impacto global \cite{ref14}. Las metaheurísticas tradicionales consiguen resultados muy cercanos al óptimo, pero requieren un proceso iterativo largo en la CPU. 
+
+El análisis comparativo (ver Tabla \ref{tab:comparative}) indica que los métodos neuronales ofrecen ventajas operativas importantes al concentrar el costo de cómputo en la fase de entrenamiento offline. Esto proporciona a los sistemas de despacho logístico tiempos de respuesta muy rápidos.
+
+% ---------------------------------------------------
+% INICIO DE TABLA (Adaptada para una sola columna)
+% ---------------------------------------------------
+\begin{table}[ht]
+\caption{Análisis comparativo de algoritmos para el CVRP}
+\label{tab:comparative}
+\centering
+\footnotesize 
+\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X @{}}
+\toprule
+\textbf{Criterio de Evaluación} & \textbf{Heurísticas y Metaheurísticas Clásicas} & \textbf{Optimización Combinatoria Neuronal} & \textbf{Grandes Modelos de Lenguaje} & \textbf{Recocido Cuántico y Enfoques Híbridos} \\ \midrule
+\textbf{Tiempo de Ejecución} & De segundos a horas. Depende de las iteraciones. Requiere reiniciar cálculo ante cambios. & Milisegundos. Ejecución en GPU casi instantánea $O(1)$. & Segundos. Sujeto a latencia de API. Procesamiento rápido. & Microsegundos en QPU + Segundos en CPU. \\ \addlinespace
+\textbf{Calidad de la Solución} & Muy alta (1\%-5\%). & Buena (1.0\% - 3.77\%). Resultados precisos ganando velocidad \cite{ref5}. & Mejora del 7.3\% de costos en CVRPTW frente a modelos estándar \cite{ref11}. & Precisión alta (2.15\%-4.72\%) \cite{ref12}. \\ \addlinespace
+\textbf{Escalabilidad} & Baja a moderada. Rendimiento de CPU decae en grafos grandes. & Muy alta. Transfieren parámetros aprendidos sin perder rendimiento \cite{ref1}. & Moderada a alta. Filtra caminos inviables de forma lógica \cite{ref9}. & Alta. División y agrupamiento sortean límites de cúbits \cite{ref14}. \\ \addlinespace
+\textbf{Resiliencia ante Cambios} & Baja. Difícil gestión en tiempo real. & Excelente. Corrigen rutas al instante usando Action Masking \cite{ref2}. & Alta. Procesa texto e incorpora restricciones nuevas sobre la marcha \cite{ref4}. & Moderada. Reestructurar memoria tabú puede ralentizar \cite{ref13}. \\ \bottomrule
+\end{tabularx}
+\end{table}
+% ---------------------------------------------------
+% FIN DE TABLA
+% ---------------------------------------------------
+
+\section{Discusión y Conclusión}
+
+\subsection{Discusión}
+Los resultados sugieren un cambio de paradigma: mientras los métodos clásicos resuelven cada instancia aisladamente, los modelos de IA e híbridos cuánticos capitalizan el conocimiento histórico y las capacidades de procesamiento paralelo del hardware moderno \cite{ref8,ref12}. La reducción de la brecha de error a niveles cercanos al 1-5\% con tiempos de ejecución en milisegundos posiciona a estas tecnologías como la opción preferente para la logística 4.0 \cite{ref20}.
+
+\subsection{Conclusión}
+Este informe técnico confirma que la Inteligencia Artificial y la Computación Cuántica proporcionan alternativas escalables y eficientes para el CVRP \cite{ref12,ref14}. Los solucionadores NCO y la guía semántica de los LLMs permiten gestionar la complejidad NP-Hard en fracciones de segundo, transformando los datos operativos en sistemas de distribución flexibles capaces de responder dinámicamente a las exigencias del mundo real \cite{ref1,ref4}.
+
+\begin{thebibliography}{99}
+\bibitem{ref1} ArXiv. (2025). Approximation schemes for capacity vehicle routing problems: A survey. \url{https://arxiv.org/abs/2306.01826}
+\bibitem{ref2} ScienceDirect. An Ant Colony Algorithm for the Capacitated Vehicle Routing Problem. \url{https://www.sciencedirect.com/science/article/abs/pii/S1571065304010868}
+\bibitem{ref3} Deep reinforcement learning for dynamic vehicle routing with demand and traffic uncertainty. \url{https://www.sciencedirect.com/science/article/pii/S2214716025000272}
+\bibitem{ref4} Cao, L., et al. (2025). A Large Language Model-Enhanced Q-learning for Capacitated Vehicle Routing Problem. \url{https://arxiv.org/abs/2505.06178}
+\bibitem{ref5} Springer Link. Solving the vehicle routing problem by a hybrid meta-heuristic algorithm. \url{https://link.springer.com/article/10.1186/2251-712X-8-11}
+\bibitem{ref6} ScienceDirect. An improved ant colony optimization for vehicle routing problems. \url{https://www.sciencedirect.com/science/article/abs/pii/S0377221708002373}
+\bibitem{ref7} IEEE Xplore. Hybrid genetic ant colony optimization algorithm for capacitated vehicle routing problem with fuzzy demand. \url{https://ieeexplore.ieee.org/document/7939215/}
+\bibitem{ref8} Efficient Neural Combinatorial Optimization Solver for the Min-max Heterogeneous Capacitated Vehicle Routing Problem. \url{https://arxiv.org/html/2507.21386}
+\bibitem{ref9} Double Deep Q-Network-Based Solution for the Dynamic Electric Vehicle Routing Problem. \url{https://www.mdpi.com/2076-3417/16/1/278}
+\bibitem{ref10} An Advanced Hybrid Quantum Tabu Search Approach to Vehicle Routing Problems. \url{https://arxiv.org/html/2501.12652v2}
+\bibitem{ref11} Solving Real-World Optimization Problems using Near-Term Quantum Computing. \url{https://scholarworks.uark.edu/etd/5691/}
+\bibitem{ref12} New Hybrid Quantum Annealing Algorithms for Solving Vehicle Routing Problem. \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC7304725/}
+\bibitem{ref13} A Hybrid Solution Method for the Capacitated Vehicle Routing Problem Using a Quantum Annealer. \url{https://www.frontiersin.org/journals/ict/articles/10.3389/fict.2019.00013/full}
+\bibitem{ref14} Analyzing performance of commercial quantum annealing solvers for the capacitated vehicle routing problem. \url{https://pubs.aip.org/aip/adv/article/15/12/125003/3373727/Analyzing-performance-of-commercial-quantum}
+\bibitem{ref15} Advanced Quantum Annealing Approach to Vehicle Routing Problems with Time Windows. \url{https://arxiv.org/pdf/2503.24285}
+\bibitem{ref17} A Hybrid Approach for Solving the Capacitated Vehicle Routing Problem. \url{https://www.researchgate.net/publication/393207722}
+\bibitem{ref18} Hybrid Quantum Genetic Algorithm with a Strongly Entanglement Recombination Process. \url{https://www.researchgate.net/publication/395908033}
+\bibitem{ref19} Hybrid Cuckoo Search for the Capacitated Vehicle Routing Problem. \url{https://www.mdpi.com/2073-8994/12/12/2088}
+\bibitem{ref20} Charting the Evolutionary Trajectory and Future Research Frontiers of the Sustainable Vehicle Routing Problems. \url{https://www.mdpi.com/2305-6290/10/6/136}
+\bibitem{ref21} Solving the Vehicle Routing Problem and its variants using Quantum Annealing. \url{https://www.informatyka.agh.edu.pl/media/uploads/kqis-55-pawel-gora-26-04-2022-slides.pdf}
+\end{thebibliography}
+
+\end{document}
