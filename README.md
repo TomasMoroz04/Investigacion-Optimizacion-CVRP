@@ -1,44 +1,81 @@
-# 🚚 Análisis y Diseño de Algoritmos: Capacitated Vehicle Routing Problem (CVRP)
+<h1 align="center">🚚 Análisis y Diseño de Algoritmos</h1>
+<h3 align="center">Capacitated Vehicle Routing Problem (CVRP)</h3>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Investigación-Académica-6C5CE7?style=for-the-badge" alt="Investigación académica">
+  <img src="https://img.shields.io/badge/Optimización-CVRP-0A7EA4?style=for-the-badge" alt="CVRP">
+  <img src="https://img.shields.io/badge/IA-Deep%20Learning-412991?style=for-the-badge&logo=pytorch&logoColor=white" alt="Deep Learning">
+  <img src="https://img.shields.io/badge/Computación-Cuántica-00897B?style=for-the-badge" alt="Computación cuántica">
+  <img src="https://img.shields.io/badge/Documento-LaTeX-008080?style=for-the-badge&logo=latex&logoColor=white" alt="LaTeX">
+</p>
 
 Artículo de investigación académica desarrollado para la cátedra de **Análisis y Diseño de Algoritmos** (3.° año de Ingeniería en Informática, UGD).
 
-Este repositorio aloja un estudio exhaustivo sobre la evolución de los métodos de resolución para el **Problema de Enrutamiento de Vehículos Capacitados (CVRP)**, un clásico problema de optimización combinatoria de clase NP-Hard. El paper analiza la transición desde las heurísticas y metaheurísticas tradicionales hacia las tecnologías de frontera, enfocándose en la **Optimización Combinatoria Neuronal (NCO)**, el uso de **Grandes Modelos de Lenguaje (LLMs)** y los enfoques híbridos de **Computación Cuántica**.
+Este repositorio contiene un estudio sobre la evolución de los métodos de resolución del **Problema de Enrutamiento de Vehículos Capacitados (CVRP)**, un problema clásico de optimización combinatoria de clase NP-hard. El trabajo analiza la transición desde heurísticas y metaheurísticas tradicionales hacia enfoques de frontera, con énfasis en **Optimización Combinatoria Neuronal (NCO)**, **Grandes Modelos de Lenguaje (LLM)** y **computación cuántica híbrida**.
 
 ---
 
-## 👥 Contexto del Proyecto y Autores
+## 📑 Índice
 
-Esta investigación fue realizada de forma colaborativa durante el ciclo lectivo 2026. 
+- [Contexto y autores](#-contexto-del-proyecto-y-autores)
+- [Tecnologías y enfoques](#-tecnologías-y-enfoques-investigados)
+- [Hallazgos del análisis](#-hallazgos-clave)
+- [Archivos del repositorio](#-estructura-del-repositorio)
+
+---
+
+## 👥 Contexto del proyecto y autores
+
+Esta investigación fue realizada de forma colaborativa durante el ciclo lectivo 2026.
 
 **Autores de la investigación:**
-* S. Halberstadt
-* M. Kalesplaner
-* **Tomás Moroz** *(Curador de este repositorio)*
-* R. Ruiz
+
+- S. Halberstadt
+- M. Kalesplaner
+- **Tomás Moroz** — curador de este repositorio
+- R. Ruiz
 
 ---
 
-## 🔬 Tecnologías y Enfoques Investigados
+## 🔬 Tecnologías y enfoques investigados
 
-El estudio realiza un análisis comparativo de algoritmos para evaluar el balance entre tiempo de ejecución (latencia), precisión de la solución (gap) y escalabilidad:
+El estudio compara familias de algoritmos considerando el tiempo de ejecución (latencia), la calidad de la solución (brecha o *gap*) y la escalabilidad.
 
-*   **Enfoques Clásicos:** Limitaciones de los algoritmos exactos (Branch-and-Bound, Branch-and-Cut) y metaheurísticas tradicionales (Tabu Search, Ant Colony Optimization, Genetic Algorithms) frente a la explosión combinatoria.
-*   **Deep Learning & NCO:** Aplicación de Redes Neuronales de Grafos (GNN) y Aprendizaje por Refuerzo (PPO) con técnicas de enmascaramiento de acciones (*Action Masking*) para generar soluciones en milisegundos y manejar la incertidumbre (tráfico, demanda dinámica).
-*   **LLMs como Guías Heurísticas:** Integración de modelos de lenguaje para aplicar lógica semántica y razonamiento estructurado (*Chain-of-Thought*) que guían las primeras fases de algoritmos Q-Learning, filtrando rutas temporalmente inviables.
-*   **Computación Cuántica Híbrida:** Solucionadores como el *Hybrid Quantum Tabu Search (HQTS)* ejecutados en procesadores *D-Wave Advantage* (Quantum Annealing) combinados con CPUs clásicas para explorar espacios de soluciones masivos en microsegundos.
+### 🧮 Enfoques clásicos
+
+Análisis de las limitaciones de algoritmos exactos como **Branch-and-Bound** y **Branch-and-Cut**, junto con metaheurísticas tradicionales como **Tabu Search**, **Ant Colony Optimization** y **Genetic Algorithms**, frente al crecimiento combinatorio del problema.
+
+### 🧠 Deep Learning y NCO
+
+Estudio de redes neuronales de grafos (**GNN**) y aprendizaje por refuerzo (**PPO**) con técnicas de enmascaramiento de acciones (*Action Masking*) para generar soluciones con baja latencia y responder a escenarios variables, como cambios de tráfico o demanda.
+
+### 💬 LLM como guías heurísticas
+
+Análisis de la integración de modelos de lenguaje para aportar información semántica y razonamiento estructurado (*Chain-of-Thought*), orientando fases iniciales de algoritmos de aprendizaje por refuerzo y filtrando rutas temporalmente inviables.
+
+### ⚛️ Computación cuántica híbrida
+
+Estudio de solucionadores como **Hybrid Quantum Tabu Search (HQTS)** sobre procesadores **D-Wave Advantage** mediante *Quantum Annealing*, combinados con CPU clásicas para explorar espacios de soluciones.
 
 ---
 
-## 📊 Hallazgos Clave
+## 📊 Hallazgos clave
 
-El análisis comparativo desarrollado en el documento demuestra que:
-1.  **Reducción drástica de latencia:** Los métodos neuronales e híbridos cuánticos trasladan el costo computacional a la fase de entrenamiento *offline*, permitiendo resolver instancias complejas en milisegundos o microsegundos, a diferencia de las horas requeridas por métodos clásicos.
-2.  **Adaptabilidad Dinámica:** Las tecnologías basadas en IA superan la rigidez de los enfoques estáticos, permitiendo recalcular rutas en tiempo real ante imprevistos logísticos (Logística 4.0).
-3.  **Competitividad en Precisión:** A pesar de la velocidad extrema, los modelos cuánticos y neuronales logran mantener brechas de error (*gaps*) marginales (1% - 4.7%) respecto a la solución óptima teórica.
+El documento presenta las siguientes conclusiones dentro del alcance de la investigación:
+
+1. **Reducción de latencia:** los enfoques neuronales e híbridos pueden trasladar parte del costo computacional a una etapa de entrenamiento *offline*, permitiendo tiempos de inferencia bajos frente a ciertos métodos clásicos.
+2. **Adaptabilidad dinámica:** los métodos basados en IA pueden facilitar el recálculo de rutas ante cambios logísticos e imprevistos en tiempo real.
+3. **Competitividad en precisión:** el documento reporta brechas (*gaps*) de entre el **1 % y el 4,7 %** respecto de la solución óptima teórica para los métodos y las instancias analizados.
+
+> **Alcance:** los resultados y comparaciones deben interpretarse según las instancias, métricas y fuentes citadas en el artículo; no implican que un método sea superior en todos los escenarios de CVRP.
 
 ---
 
-## 📂 Estructura del Repositorio
+## 📂 Estructura del repositorio
 
-* `Investigacion_CVRP.pdf` — Documento completo del artículo de investigación (formato académico IEEE/Springer LNCS), incluyendo introducción, estado del arte, análisis técnico detallado, tabla comparativa y referencias bibliográficas.
-* `Investigacion_CVRP_Latex.tex` — Documento con el código en LaTeX.
+- **`Investigacion_CVRP.pdf`** — artículo completo en formato académico IEEE/Springer LNCS, con introducción, estado del arte, análisis técnico, tabla comparativa y referencias bibliográficas.
+- **`Investigacion_CVRP_Latex.tex`** — código fuente en LaTeX utilizado para generar el documento.
+
+---
+
+<p align="center"><b>Algoritmos · Optimización combinatoria · IA · Computación cuántica</b></p>
