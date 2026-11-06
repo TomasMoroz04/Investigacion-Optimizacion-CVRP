@@ -4,7 +4,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Investigación-Académica-6C5CE7?style=for-the-badge" alt="Investigación académica">
   <img src="https://img.shields.io/badge/Optimización-CVRP-0A7EA4?style=for-the-badge" alt="CVRP">
-  <img src="https://img.shields.io/badge/IA-Deep%20Learning-412991?style=for-the-badge&logo=pytorch&logoColor=white" alt="Deep Learning">
+  <img src="https://img.shields.io/badge/IA-Deep%20Learning-412991?style=for-the-badge" alt="Deep Learning">
   <img src="https://img.shields.io/badge/Computación-Cuántica-00897B?style=for-the-badge" alt="Computación cuántica">
   <img src="https://img.shields.io/badge/Documento-LaTeX-008080?style=for-the-badge&logo=latex&logoColor=white" alt="LaTeX">
 </p>
